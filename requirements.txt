@@ -1,0 +1,11 @@
+# %%writefile requirements.txt
+torch # PyTorch library
+ultralytics # For YOLOv5 inference
+fastapi
+uvicorn
+python-multipart # For file uploads in FastAPI
+Pillow # For image processing in FastAPI (PIL is a dependency of pillow)
+numpy
+opencv-python # For drawing bounding boxes on images
+streamlit
+seaborn # For visualization in Streamlit
