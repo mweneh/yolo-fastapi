@@ -26,7 +26,7 @@ st.markdown("""
     /* Overall App Background and Default Text Color */
     .stApp {
         background-color: #0A1828; /* Light gray background for the entire app */
-        color: #FFD700; /* Default dark text color for the entire app */
+        color: white; /* Default text color for the app */
     }
 
     /* Main Content Area Specific Styles */
@@ -86,7 +86,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-st.title("🚗 Car Damage Object Detector (YOLOv5)")
+st.title("Car Damage Object Detector (YOLOv5)")
 st.markdown("Upload an image of a car or provide an image URL to detect and locate specific damage types.")
 
 # --- FastAPI Endpoint Configuration ---
