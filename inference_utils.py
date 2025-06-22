@@ -2,10 +2,7 @@
 import torch
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-import io
 import os
-import cv2 # For drawing on images
-
 # Define your class names (MUST match the order in your data.yaml for YOLOv5)
 CLASS_NAMES = ['Front-Windscreen-Damage', 'Headlight-Damage', 'Major-Rear-Bumper-Dent', 'Rear-windscreen-Damage',
                'RunningBoard-Dent', 'Sidemirror-Damage', 'Signlight-Damage', 'Taillight-Damage',
@@ -82,15 +79,41 @@ def draw_boxes_on_image(image_pil: Image.Image, detections: list):
     try:
         font = ImageFont.truetype(font_path, size=16)
     except IOError:
-        font = ImageDraw.Draw(Image.new('RGB', (1,1))).getfont() # Fallback to default if font not found
+        # Fallback to default if font not found (modern way)
+        font = ImageFont.load_default()
+        print("Could not load custom font, using default PIL font.") # Optional: print a message
 
     for det in detections:
         x1, y1, x2, y2 = det['box']
         label = f"{det['class']} ({det['confidence']:.2f})"
-        color = "red" # You can add a color mapping based on class if desired
+        color = "red"
 
         draw.rectangle([x1, y1, x2, y2], outline=color, width=3)
-        draw.text((x1 + 5, y1 + 5), label, fill=color, font=font)
+
+        # Calculate text size for background rectangle (optional, but good practice)
+        # PIL's textbbox is the modern way; textsize is deprecated
+        try:
+            text_bbox = draw.textbbox((x1 + 5, y1 + 5), label, font=font)
+            text_width = text_bbox[2] - text_bbox[0]
+            text_height = text_bbox[3] - text_bbox[1]
+        except AttributeError: # Fallback for older PIL versions
+            text_width, text_height = draw.textsize(label, font=font)
+
+
+        # Draw a background rectangle for the text for better readability
+        # Adjust padding as needed
+        text_bg_x1 = x1
+        text_bg_y1 = y1
+        text_bg_x2 = x1 + text_width + 10 # Add some padding
+        text_bg_y2 = y1 + text_height + 5 # Add some padding
+
+        # Ensure background is above the box if drawing below, or below if drawing above
+        # Here drawing text on top of the box
+        draw.rectangle([text_bg_x1, text_bg_y1, text_bg_x2, text_bg_y2], fill=color)
+
+        # Draw text
+        draw.text((x1 + 5, y1), label, fill="white", font=font) # Text directly on the box, adjusted Y position
+
     return image_pil
 
 if __name__ == "__main__":
